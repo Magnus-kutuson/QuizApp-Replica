@@ -22,9 +22,9 @@ describe('CategoryIconComponent', () => {
   });
 
   it('should display the selected category', () => {
-    const catergories = ['HTML', 'CSS', 'JavaScript', 'Accessibility'];
-    component.selectedCategory = 'CSS';
+    const categories = ['HTML', 'CSS', 'JavaScript', 'Accessibility'];
+    component.selectedCategory = 'HTML';
     fixture.detectChanges();
-    expect(catergories).toContain(component.selectedCategory);
+    expect(categories).toContain(component.selectedCategory);
   });
 });

@@ -25,6 +25,7 @@ export class QuestionsComponent implements OnInit {
     this.loadProgress();
   }
 
+
   currentQuizQuestion() {
     return this.quizzes[this.quizIndex].questions[this.questionIndex];
   }

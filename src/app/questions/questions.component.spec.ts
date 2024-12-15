@@ -1,103 +1,61 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { QuestionsComponent } from './questions.component';
-// import { Quiz } from '../quiz';
-// import { By } from '@angular/platform-browser';
+import { QuestionsComponent } from './questions.component';
 
-// describe('QuestionsComponent', () => {
-//   let component: QuestionsComponent;
-//   let fixture: ComponentFixture<QuestionsComponent>;
-//   const mockQuizzes: Quiz[] = []
+import  { Quiz } from '../quiz';
 
-//   beforeEach(async () => {
-//     await TestBed.configureTestingModule({
-//       imports: [QuestionsComponent],
-//     })
+describe('QuestionsComponent', () => {
+  let component: QuestionsComponent;
 
-//     fixture = TestBed.createComponent(QuestionsComponent);
-//     component = fixture.componentInstance;
-//     component.quizzes = mockQuizzes;
-//     fixture.detectChanges();
-//   });
+  beforeEach(() => {
+    component = new QuestionsComponent();
+    component.quizzes = [{
+      questions: [{
+        question: 'test question',
+        answer: 'correct'
+      }]
+    } as Quiz];
+    component.questionIndex = 0;
+    component.selectedAnswer = 'correct';
+    component.correctAnswersCount = 0;
+  });
 
-//   it('should create the component', () => {
-//     expect(component).toBeTruthy();
-//   });
+  // When answer is selected, verify correct answer increases correctAnswersCount
+  it('should increment correctAnswersCount when selected answer is correct', () => {
+    component.submitAnswer();
 
-//        // Handle empty or undefined quizzes array
-//        it('should handle undefined quizzes array without errors', () => {
-//         const component = new QuestionsComponent();
-//         component.quizzes = undefined as unknown as Quiz[];
-    
-//         expect(() => {
-//           component.currentQuizQuestion();
-//         }).toThrow();
-    
-//         expect(() => {
-//           component.nextQuestion();
-//         }).toThrow();
-    
-//         expect(() => {
-//           component.isLastQuestion();
-//         }).toThrow();
-//       });
-      
-//   it('should display the current question', () => {
-//     const questionText = fixture.debugElement.query(By.css('.question-text')).nativeElement.textContent;
-//     expect(questionText).toContain(mockQuizzes[0].questions[0].question);
-//   });
+    expect(component.correctAnswersCount).toBe(1);
+    expect(component.isCorrect).toBe(true);
+  });
 
-//   it('should allow selecting an answer', () => {
-//     component.selectAnswer('A');
-//     expect(component.selectedAnswer).toBe('A');
-//   });
+  it('should show error message when no answer selected', () => {
+    const component = new QuestionsComponent();
+    component.selectedAnswer = null;
+    component.showErrorMessage = false;
 
-//   it('should not allow selecting an answer after submission', () => {
-//     component.selectAnswer('A');
-//     component.submitAnswer();
-//     component.selectAnswer('B');
-//     expect(component.selectedAnswer).toBe('A');
-//   });
+    component.submitAnswer();
 
-//   it('should emit the correctAnswersCount on quiz completion', () => {
-//     spyOn(component.quizFinished, 'emit');
+    expect(component.showErrorMessage).toBe(true);
+    expect(component.answerSubmitted).toBeFalsy();
+  });
 
-//     // Simulate completing all questions
-//     component.quizIndex = mockQuizzes.length - 1;
-//     component.questionIndex = mockQuizzes[1].questions.length - 1;
-//     component.nextQuestion();
+  it('should change answerSubmitted from false to true on first submission', () => {
+    component.submitAnswer();
+    expect(component.answerSubmitted).toBe(true);
+  });
 
-//     expect(component.quizFinished.emit).toHaveBeenCalledWith(component.correctAnswersCount);
-//   });
+  it('should remain true on subsequent submissions', () => {
+    component.submitAnswer(); // First submission
+    component.submitAnswer(); // Second submission
+    expect(component.answerSubmitted).toBe(true);
+  });
 
-//   it('should save progress to localStorage', () => {
-//     spyOn(localStorage, 'setItem');
-//     component.correctAnswersCount = 2;
-//     expect(localStorage.setItem).toHaveBeenCalledWith(
-//       'quizProgress',
-//       JSON.stringify({
-//         correctAnswersCount: 2,
-//         quizIndex: 0,
-//         questionIndex: 0,
-//       })
-//     );
-//   });
+  it('should set answerSubmitted regardless of answer correctness', () => {
+    component.selectedAnswer = 'A1'; // Correct answer
+    component.submitAnswer();
+    expect(component.answerSubmitted).toBe(true);
 
-//   it('should load progress from localStorage', () => {
-//     const progress = {
-//       correctAnswersCount: 1,
-//       quizIndex: 1,
-//       questionIndex: 1,
-//     };
-//     spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(progress));
-//     expect(component.correctAnswersCount).toBe(1);
-//     expect(component.quizIndex).toBe(1);
-//     expect(component.questionIndex).toBe(1);
-//   });
-
-//   it('should reset question state after nextQuestion()', () => {
-//     component.nextQuestion();
-//     expect(component.answerSubmitted).toBeTruthy();
-//     expect(component.selectedAnswer).toBeNull();
-//     expect(component.isCorrect).toBeNull();
-//   });
-// });
+    component.answerSubmitted = false; // Reset for next test
+    component.selectedAnswer = 'Wrong Answer'; // Incorrect answer
+    component.submitAnswer();
+    expect(component.answerSubmitted).toBe(true);
+  });
+});
